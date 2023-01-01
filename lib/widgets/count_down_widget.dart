@@ -1,8 +1,6 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:pictionary2/model/settings_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CountdownWidget extends StatefulWidget {
   final double size = 120;
@@ -38,15 +36,16 @@ class _CountdownWidget extends State<CountdownWidget>
   }
 
   void setCountDown() {
-    if (!mounted) return;
+    if (!mounted || isTimeout) return;
     setState(() {
       final seconds = currentTimeout.inSeconds - 1;
+
       if (seconds < 0 && !isTimeout) {
         isTimeout = true;
+        countdownTimer!.cancel();
         widget.onTimeout();
-      }
-
-      currentTimeout = Duration(seconds: seconds);
+      } else
+        currentTimeout = Duration(seconds: seconds);
     });
   }
 

@@ -22,40 +22,73 @@ class _MultiWordsPictionaryScreenState
   List<String> _words = [];
   List<String> _rejected = [];
   List<String> _accepted = [];
+  late Future<void> _initializationFuture;
 
   @override
   void initState() {
-    _wordsRepository
+    super.initState();
+    _initializationFuture = _wordsRepository
         .init()
         .then((repository) => {
               repository
                   .getSelectedCategories()
-                  .then((categories) => categories.forEach((category) => {
-                        repository
-                            .getWords(categoryName: category)
-                            .then((value) => {_words.addAll(value)})
-                      }))
-            })
-        .then((value) => setState(() {
-              _words = _words;
-            }));
-    super.initState();
+                  .then((categories) => repository
+                    .getWords(categories: categories)
+                    .then((value) => {_words.addAll(value)})
+                  )
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: OrientationBuilder(
-      builder: (BuildContext context, Orientation orientation) {
-        return Center(
-            child: orientation == Orientation.portrait
-                ? Column(
+    return Scaffold(body: FutureBuilder<void>(
+        future: _initializationFuture,
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          Widget widget;
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting: {
+              widget = Center(
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(),
+                )
+              );
+            }
+            break;
+
+            case ConnectionState.done: {
+              var children = getChildren();
+              widget = Center(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: getChildren(),
+                    children: children
                   )
-                : Row(
-                    children: getChildren(),
-                  ));
-      },
+              );
+            }
+            break;
+
+            default: {
+              widget = Center(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(
+                    Icons.error_outline,
+                    color: Colors.red,
+                    size: 60,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 16),
+                    child: Text('Error: ${snapshot.error}'),
+                )])
+              );
+            }
+            break;
+          }
+
+          return widget;
+        }
     ));
   }
 
@@ -137,6 +170,10 @@ class _MultiWordsPictionaryScreenState
         setState(() {
           resultList.add(_words.last);
           _words.removeLast();
+          if (_words.isEmpty) {
+            _words = _accepted + _rejected;
+            _words.shuffle();
+          }
         });
       },
     );

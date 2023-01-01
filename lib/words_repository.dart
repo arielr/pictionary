@@ -28,8 +28,13 @@ class WordsRepository implements IWordsRepository {
   }
 
   @override
-  Future<List<String>> getWords({required String categoryName}) {
-    return Future.value(_map[categoryName] ?? []);
+  Future<List<String>> getWords({required List<String> categories}) {
+    List<String> words = [];
+    categories.forEach((category) {
+      words.addAll(_map[category]!);
+    });
+    words.shuffle();
+    return Future.value(words);
   }
 
   @override
@@ -56,7 +61,7 @@ class WordsRepository implements IWordsRepository {
     return rootBundle
         .loadString('assets/data/${resourceName}')
         .then((fileContent) {
-      _map[categoryName] = fileContent.split("\n");
+      _map[categoryName] = fileContent.split("\r\n");
     });
   }
 }
