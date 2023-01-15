@@ -1,7 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pictionary2/screens/main_screen.dart';
+import 'package:pictionary2/screens/settings_screen.dart';
 
+import '../model/settings_data.dart';
 import 'multi_words_pictionary_screen.dart';
 
 class TimeupScreen extends StatelessWidget {
@@ -48,7 +50,8 @@ class TimeupScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => MultiWordsPictionaryScreen()),
+                        builder: (context) =>
+                            SettingsScreen(SettingsData.globalSettings)),
                   );
                 },
                 child: Text("New Game"),
