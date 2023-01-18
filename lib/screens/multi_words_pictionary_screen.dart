@@ -135,20 +135,23 @@ class _MultiWordsPictionaryScreenState
         flex: 25,
         child: Center(
           child: SettingsData.globalSettings.enableTime
-              ? CountdownWidget(() {
-                  setState(() {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              TimeupScreen(_accepted, _rejected)),
-                    );
-                  });
-                })
-              : Container(),
+              ? CountdownWidget(onTimeout)
+              : Container(
+                  child: ElevatedButton(
+                  onPressed: onTimeout,
+                  child: Text("Finish"),
+                )),
         ),
       ),
     ];
+  }
+
+  onTimeout() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => TimeupScreen(_accepted, _rejected)),
+    );
   }
 
   Widget createTarget(List<String> resultList) {
