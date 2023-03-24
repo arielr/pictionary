@@ -24,7 +24,7 @@ class TimeupScreen extends StatelessWidget {
         children: <Widget>[
           FittedBox(
             fit: BoxFit.fitWidth,
-            child: Text("Time's Up!",
+            child: Text("Round Over",
                 style: Theme.of(context)
                     .textTheme
                     .headline3

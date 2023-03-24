@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pictionary2/model/settings_data.dart';
-import 'multi_words_pictionary_screen.dart';
 import 'settings_screen.dart';
 
 class MainScreen extends StatelessWidget {
