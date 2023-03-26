@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pictionary2/widgets/word_card.dart';
 import '../interfaces/iword_repository.dart';
+import '../model/settings_data.dart';
 import '../widgets/count_down_widget.dart';
 import '../widgets/drag_widget.dart';
 import '../words_repository.dart';
@@ -27,72 +28,68 @@ class _MultiWordsPictionaryScreenState
   @override
   void initState() {
     super.initState();
-    _initializationFuture = _wordsRepository
-        .init()
-        .then((repository) => {
-              repository
-                  .getSelectedCategories()
-                  .then((categories) => repository
-                    .getWords(categories: categories)
-                    .then((value) => {_words.addAll(value)})
-                  )
+    _initializationFuture = _wordsRepository.init().then((repository) => {
+          repository.getSelectedCategories().then((categories) => repository
+              .getWords(categories: categories)
+              .then((value) => {_words.addAll(value)}))
         });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: FutureBuilder<void>(
-        future: _initializationFuture,
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          Widget widget;
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting: {
-              widget = Center(
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: CircularProgressIndicator(),
-                )
-              );
-            }
-            break;
+    return Scaffold(
+        body: FutureBuilder<void>(
+            future: _initializationFuture,
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              Widget widget;
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  {
+                    widget = Center(
+                        child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: CircularProgressIndicator(),
+                    ));
+                  }
+                  break;
 
-            case ConnectionState.done: {
-              var children = getChildren();
-              widget = Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: children
-                  )
-              );
-            }
-            break;
+                case ConnectionState.done:
+                  {
+                    var children = getChildren();
+                    widget = Center(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: children));
+                  }
+                  break;
 
-            default: {
-              widget = Center(
-                child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.red,
-                    size: 60,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16),
-                    child: Text('Error: ${snapshot.error}'),
-                )])
-              );
-            }
-            break;
-          }
+                default:
+                  {
+                    widget = Center(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 60,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: Text('Error: ${snapshot.error}'),
+                          )
+                        ]));
+                  }
+                  break;
+              }
 
-          return widget;
-        }
-    ));
+              return widget;
+            }));
   }
 
   List<Widget> getChildren() {
+    String words = _words.isEmpty ? "empty" : _words.last;
     return [
       Expanded(
         flex: 75,
@@ -107,8 +104,8 @@ class _MultiWordsPictionaryScreenState
                 alignment: Alignment.center,
                 children: [
                   Dismissible(
-                    key: Key(_words.last),
-                    child: WordCard(word: _words.last),
+                    key: Key(words),
+                    child: WordCard(word: words),
                     onDismissed: (direction) {
                       (direction == DismissDirection.endToStart
                               ? _rejected
@@ -137,18 +134,24 @@ class _MultiWordsPictionaryScreenState
       Expanded(
         flex: 25,
         child: Center(
-          child: CountdownWidget(() {
-            setState(() {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => TimeupScreen(_accepted, _rejected)),
-              );
-            });
-          }),
+          child: SettingsData.globalSettings.enableTime
+              ? CountdownWidget(onTimeout)
+              : Container(
+                  child: ElevatedButton(
+                  onPressed: onTimeout,
+                  child: Text("Finish"),
+                )),
         ),
       ),
     ];
+  }
+
+  onTimeout() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => TimeupScreen(_accepted, _rejected)),
+    );
   }
 
   Widget createTarget(List<String> resultList) {

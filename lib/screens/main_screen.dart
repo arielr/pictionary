@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pictionary2/model/settings_data.dart';
-import 'multi_words_pictionary_screen.dart';
 import 'settings_screen.dart';
 
 class MainScreen extends StatelessWidget {
@@ -23,21 +22,6 @@ class MainScreen extends StatelessWidget {
                 ));
           },
           child: Text("New Game"),
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        ElevatedButton(
-          style: style,
-          onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      SettingsScreen(SettingsData.globalSettings),
-                ));
-          },
-          child: Text("Settings"),
         ),
         Container(
           color: Colors.red,

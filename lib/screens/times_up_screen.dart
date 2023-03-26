@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pictionary2/screens/main_screen.dart';
-
 import 'multi_words_pictionary_screen.dart';
 
 class TimeupScreen extends StatelessWidget {
@@ -25,7 +24,7 @@ class TimeupScreen extends StatelessWidget {
         children: <Widget>[
           FittedBox(
             fit: BoxFit.fitWidth,
-            child: Text("Time's Up!",
+            child: Text("Round Over",
                 style: Theme.of(context)
                     .textTheme
                     .headline3
@@ -51,7 +50,7 @@ class TimeupScreen extends StatelessWidget {
                         builder: (context) => MultiWordsPictionaryScreen()),
                   );
                 },
-                child: Text("New Game"),
+                child: Text("New Round"),
               ),
               const SizedBox(
                 width: 20,
